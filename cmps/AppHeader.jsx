@@ -2,13 +2,19 @@ const { useState } = React
 const { Link, NavLink } = ReactRouterDOM
 const { useNavigate } = ReactRouter
 
+const {useSelector,useDispatch}=ReactRedux
+
 import { userService } from '../services/user.service.js'
 import { UserMsg } from "./UserMsg.jsx"
 import { LoginSignup } from './LoginSignup.jsx'
 import { showErrorMsg } from '../services/event-bus.service.js'
+import { INCREMENT } from '../store/store.js'
 
 
 export function AppHeader() {
+    const dispatch=useDispatch()
+    
+    const count=useSelector(state=>state.count)
     const navigate = useNavigate()
     const [user, setUser] = useState(userService.getLoggedinUser())
     
@@ -20,9 +26,12 @@ export function AppHeader() {
             .catch((err) => {
                 showErrorMsg('OOPs try again')
             })
+
+            dispatch({type:INCREMENT})
     }
 
     function onSetUser(user) {
+
         setUser(user)
         navigate('/')
     }
@@ -39,6 +48,7 @@ export function AppHeader() {
                 ) : (
                     <section>
                         <LoginSignup onSetUser={onSetUser} />
+                        <p>{count}</p>
                     </section>
                 )}
                 <nav className="app-nav">
