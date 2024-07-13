@@ -5,7 +5,7 @@ import { todoService } from "../services/todo.service.js"
 import { showErrorMsg, showSuccessMsg } from "../services/event-bus.service.js"
 
 import { loadToDos, removeToDo, saveToDo } from "../store/todo.action.js"
-import { START_LOADING, STOP_LOADING } from "../store/store.js"
+import { SET_FILTER_BY } from "../store/store.js"
 
 const { useState, useEffect, useRef } = React
 
@@ -17,23 +17,16 @@ export function TodoIndex() {
     const countLoaded = useRef(0)
     const todos = useSelector(state => state.todos)
     const Loading = useSelector(state => state.isLoading)
-    console.log(Loading);
+    const filterBy = useSelector(state => state.filterBy)
  
     // Special hook for accessing search-params:
     const [searchParams, setSearchParams] = useSearchParams()
 
-    const defaultFilter = todoService.getFilterFromSearchParams(searchParams)
-
-    const [filterBy, setFilterBy] = useState(defaultFilter)
-    useEffect(() => {
-        
-        // dispatch({ type: START_LOADING ,isLoading:true})
+    
+    useEffect(() => {  
         setSearchParams(filterBy)
-        loadToDos(filterBy)
-    //     .then(todos => countLoaded.current < 3 ? showSuccessMsg('todos loaded!') : console.log('the todos load again'))
-    //     // .then(dispatch({ type: STOP_LOADING ,isLoading:false}))
-    //         .catch(err => showErrorMsg('Error loadig todos...'))
-    // }
+        loadToDos()
+
      } , [filterBy])
 
     function onRemoveTodo(todoId) {
@@ -57,11 +50,13 @@ export function TodoIndex() {
                 showErrorMsg('Cannot toggle todo ' + todo._Id)
             })
     }
+    function onSetFilterBy(filterBy){
+        dispatch ({type:SET_FILTER_BY, filterBy})
+    }
 
-    // if ( Loading) return <div>Loading...</div>
     return (
         <section className="todo-index">
-            <TodoFilter filterBy={filterBy} onSetFilterBy={setFilterBy} />
+            <TodoFilter filterBy={filterBy} onSetFilterBy={onSetFilterBy} />
             <div>
                 <Link to="/todo/edit" className="btn" >Add Todo</Link>
             </div>
