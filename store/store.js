@@ -1,4 +1,6 @@
-const {createStore} = Redux
+const {createStore,combineReducers,compose} = Redux
+
+import { todoService } from "../services/todo.service.js"
 
 export  const INCREMENT='INCREMENT'
 export  const SET_TODOS ='SET_TODOS'
@@ -6,12 +8,14 @@ export  const REMOVE_TODO ='REMOVE_TODO'
 export  const ADD_TODO ='ADD_TODO'
 export  const UPDATE_TODO ='UPDATE_TODO'
 export const SET_IS_LOADING='SET_IS_LOADING'
+export const SET_FILTER_BY='SET_FILTER_BY'
 
 
 const initialState={
 count:50,
 todos:[],
 isLoading:false,
+filterBy: todoService.getDefaultFilter()
 }
 
 function appReducer(state=initialState,action={}){
@@ -33,12 +37,15 @@ function appReducer(state=initialState,action={}){
             case  SET_IS_LOADING:
                return {...state ,isLoading: action.isLoading }  
 
+            case  SET_FILTER_BY:
+               return {...state ,filterBy: {...state.filterBy, ...action.filterBy} }  
+
     
         default:
             return state
     }
 }
-
-export const store=createStore(appReducer)
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
+export const store=createStore(appReducer,composeEnhancers())
 
 window.gStore = store
